@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Belvedersi </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset e stili base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+        }
+
+        :root {
+            --gold: #d4af37;
+            --dark-gold: #b8941f;
+            --black: #1a1a1a;
+            --light-cream: #f9f7f4;
+            --medium-gray: #2a2a2a;
+            --light-gray: #e8e0d5;
+        }
+
+        body {
+            background-color: var(--light-cream);
+            color: var(--black);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        #loading-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-logo {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 2rem;
+            background-color: var(--light-cream);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse 2s infinite;
+        }
+
+        .loading-logo img {
+            max-width: 80%;
+            max-height: 80%;
+        }
+
+        .loading-text {
+            color: var(--light-cream);
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            margin-bottom: 2rem;
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 2px;
+            background-color: var(--medium-gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 30%;
+            background-color: var(--gold);
+            animation: loading 2s infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -30%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(212, 175, 55, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        /* Header e navigazione */
+        header {
+            background-color: var(--black);
+            color: var(--light-gray);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            transition: transform 0.5s ease;
+        }
+
+        header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 150px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover img {
+            transform: scale(1.05);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 2.5rem;
+            position: relative;
+        }
+
+        nav ul li a {
+            color: var(--light-gray);
+            text-decoration: none;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--gold);
+            transition: width 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: var(--gold);
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .icon {
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .icon:hover {
+            color: var(--gold);
+            transform: scale(1.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 0 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1.5s ease 0.5s forwards;
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 4px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--gold);
+            color: var(--black);
+            padding: 14px 35px;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 2px;
+            transition: all 0.4s;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.7s;
+        }
+
+        .btn:hover {
+            background-color: var(--dark-gold);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        /* Sezioni prodotti */
+        .section-title {
+            text-align: center;
+            margin: 6rem 0 3rem;
+            font-size: 2.5rem;
+            letter-spacing: 3px;
+            position: relative;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 2px;
+            background: var(--gold);
+            margin: 15px auto;
+        }
+
+        .products-section {
+            padding: 4rem 0;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .products-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .products-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 3rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: transform 0.5s, box-shadow 0.5s;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .product-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            height: 400px;
+            background-color: #f5f5f5;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.7s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 2rem;
+            position: relative;
+        }
+
+        .product-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+        }
+
+        .product-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .product-price {
+            font-weight: bold;
+            color: var(--gold);
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        /* Sezione clienti prestigiosi */
+        .prestigious-clients {
+            background-color: var(--black);
+            color: var(--light-gray);
+            padding: 6rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prestigious-clients::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1519457431-44ccd64a579b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+        }
+
+        .clients-title {
+            font-size: 2.2rem;
+            margin-bottom: 3rem;
+            letter-spacing: 3px;
+            position: relative;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        .client-logos {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 3rem;
+            position: relative;
+        }
+
+        .client-logo {
+            font-size: 1.3rem;
+            font-style: italic;
+            opacity: 0.8;
+            padding: 1rem 2rem;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            transition: all 0.4s;
+        }
+
+        .client-logo:hover {
+            opacity: 1;
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Sezione contatti e mappa */
+        .contact-section {
+            padding: 6rem 0;
+            background-color: var(--light-cream);
+        }
+
+        .contact-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .contact-info {
+            padding-right: 2rem;
+        }
+
+        .contact-title {
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+            position: relative;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        .contact-title:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 2px;
+            background: var(--gold);
+            margin: 15px 0;
+        }
+
+        .contact-details {
+            margin-bottom: 2.5rem;
+        }
+
+        .contact-details p {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-details i {
+            margin-right: 1rem;
+            color: var(--gold);
+            width: 20px;
+        }
+
+        .map-container {
+            height: 400px;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--black);
+            color: var(--light-gray);
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-column h3 {
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            font-weight: 400;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-column ul li a {
+            color: var(--light-gray);
+            text-decoration: none;
+            transition: color 0.3s;
+            position: relative;
+            padding-left: 0;
+            transition: padding-left 0.3s;
+        }
+
+        .footer-column ul li a:hover {
+            color: var(--gold);
+            padding-left: 10px;
+        }
+
+        .footer-column ul li a:hover::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+        }
+
+        .newsletter-form {
+            display: flex;
+            margin-top: 1rem;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: var(--medium-gray);
+            color: var(--light-gray);
+            font-size: 1rem;
+        }
+
+        .newsletter-form button {
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            padding: 0 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .newsletter-form button:hover {
+            background: var(--dark-gold);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--medium-gray);
+            font-size: 0.9rem;
+            color: #999;
+            letter-spacing: 1px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            
+            .contact-info {
+                padding-right: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0.5rem 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .client-logos {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-logo">
+            <img src="logo.png" alt="Boutique di Lusso">
+        </div>
+        <div class="loading-text">Belvedersi</div>
+        <div class="loading-bar"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="logo.png" alt="Boutique di Lusso">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Camicie</a></li>
+                    <li><a href="#">Abiti</a></li>
+                    <li><a href="#">Accessori</a></li>
+                    <li><a href="#">Collezione</a></li>
+                    <li><a href="#">Chi Siamo</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>ELEGANZA SENZA TEMPO</h1>
+            <p>La perfezione sartoriale per clienti esigenti, inclusi capi di Stato e personalità di rilievo mondiale</p>
+            <a href="#" class="btn">SCOPRI LA COLLEZIONE</a>
+        </div>
+    </section>
+
+    <!-- Sezione Camicie -->
+    <section class="products-section" id="camicie">
+        <h2 class="section-title">LE NOSTRE CAMICIE</h2>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1596755094514-f87e34085b2c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')"></div>
+                <div class="product-info">
+                    <h3 class="product-title">Camicia Classica Bianca</h3>
+                    <p class="product-description">Realizzata con il miglior cotone egiziano, perfetta per occasioni formali ed eventi di gala.</p>
+                    <p class="product-price">€ 450</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')"></div>
+                <div class="product-info">
+                    <h3 class="product-title">Camicia Azzurra French Cuff</h3>
+                    <p class="product-description">Elegante camicia con polsini doppi, ideale per essere abbinata a gemme di pregio.</p>
+                    <p class="product-price">€ 520</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image" style="background-image: url('https://tse2.mm.bing.net/th/id/OIP.oUEeCEWT9MeN6hg5w-ahigHaJ_?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3')"></div>
+                <div class="product-info">
+                    <h3 class="product-title">Camicia Rigata Borgogna</h3>
+                    <p class="product-description">Stile contemporaneo con finiture di pregio, perfetta per il business di alto livello.</p>
+                    <p class="product-price">€ 480</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sezione Abiti -->
+    <section class="products-section" id="abiti">
+        <h2 class="section-title">ABITI SU MISURA</h2>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1598808503746-f34c53b9323e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80')"></div>
+                <div class="product-info">
+                    <h3 class="product-title">Abito Sartoriale Blu Notte</h3>
+                    <p class="product-description">Realizzato con lana super 150s, taglio classico italiano per eleganza senza tempo.</p>
+                    <p class="product-price">€ 2.800</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image" style="background-image: url('https://www.gutteridge.com/on/demandware.static/-/Sites-catalog-gutteridge-master/default/dw155999a4/hi-res/CF772GUPSX2F_0218C_001.jpg')"></div>
+                <div class="product-info">
+                    <h3 class="product-title">Camicia slim fit in popeline di cotone stretch</h3>
+                    <p class="product-description">Perfetto per matrimoni e occasioni speciali, con dettagli in seta e cashmere.</p>
+                    <p class="product-price">€ 3.200</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image" style="background-image: url('https://tse1.mm.bing.net/th/id/OIP.pXeXMk0elf40_xthb0yQ9gHaLH?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3')"></div>
+                <div class="product-info">
+                    <h3 class="product-title">Camicia uomo collo button</h3>
+                    <p class="product-description">Stile inglese rivisitato in chiave italiana, per un look autorevole e raffinato.</p>
+                    <p class="product-price">€ 2.950</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sezione Clienti Prestigiosi -->
+    <section class="prestigious-clients">
+        <h2 class="clients-title">LA NOSTRA CLIENTELA ESIGENTE</h2>
+        <div class="client-logos">
+            <div class="client-logo">Presidenza della Repubblica Italiana</div>
+            <div class="client-logo">Quirinale</div>
+            <div class="client-logo">Palazzo Chigi</div>
+            <div class="client-logo">Capi di Stato Internazionali</div>
+        </div>
+    </section>
+
+    <!-- Sezione Contatti e Mappa -->
+    <section class="contact-section">
+        <div class="contact-container">
+            <div class="contact-info">
+                <h2 class="contact-title">CONTATTACI</h2>
+                <div class="contact-details">
+                    <p><i class="fas fa-map-marker-alt"></i> Corso Mazzini 97, 60121 Ancona, Italia</p>
+                    <p><i class="fas fa-phone"></i> 071 206 089</p>
+                    <p><i class="fas fa-envelope"></i> info@boutiquedilusso.it</p>
+                    <p><i class="fas fa-clock"></i> Lun-Ven: 9:00-19:00 | Sab: 10:00-18:00</p>
+                </div>
+                <p>La nostra boutique è situata nel cuore di Ancona, pronta ad accogliere la clientela più esigente con un servizio personalizzato e discreto.</p>
+            </div>
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2873.991686057931!2d13.51811131549925!3d43.91554497911385!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132cff6d6f8b9c21%3A0x78d79cd44a8b6f1a!2sCorso%20Giuseppe%20Mazzini%2C%2097%2C%2060121%20Ancona%20AN%2C%20Italia!5e0!3m2!1sit!2sfr!4v1657543721234!5m2!1sit!2sfr" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3> Belvedersi </h3>
+                <p>Dal 1980, creiamo capi sartoriali di eccellenza per una clientela esigente che apprezza la perfezione nei dettagli.</p>
+            </div>
+            <div class="footer-column">
+                <h3>Collezioni</h3>
+                <ul>
+                    <li><a href="#">Camicie Sartoriali</a></li>
+                    <li><a href="#">Abiti su Misura</a></li>
+                    <li><a href="#">Accessori di Lusso</a></li>
+                    <li><a href="#">Collezione Privée</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Servizi</h3>
+                <ul>
+                    <li><a href="#">Sartoria Personalizzata</a></li>
+                    <li><a href="#">Consulenza Stile</a></li>
+                    <li><a href="#">Consegna Prioritaria</a></li>
+                    <li><a href="#">Assistenza Clienti VIP</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Newsletter</h3>
+                <p>Iscriviti per ricevere anteprime e offerte esclusive.</p>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="La tua email">
+                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2023 Belvedersi - Tutti i diritti riservati
+        </div>
+    </footer>
+
+    <script>
+        // Gestione della schermata di caricamento
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loading-screen');
+            setTimeout(function() {
+                loadingScreen.classList.add('fade-out');
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 1000);
+            }, 2000);
+        });
+
+        // Animazioni al scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            // Header hide/show on scroll
+            let lastScrollTop = 0;
+            const header = document.querySelector('header');
+            
+            window.addEventListener('scroll', function() {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                
+                if (scrollTop > lastScrollTop && scrollTop > 100) {
+                    header.classList.add('hidden');
+                } else {
+                    header.classList.remove('hidden');
+                }
+                
+                lastScrollTop = scrollTop;
+            });
+
+            // Intersection Observer per animazioni al scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (entry.target.classList.contains('products-section')) {
+                            entry.target.classList.add('visible');
+                            
+                            // Animazione per le card dei prodotti
+                            const productCards = entry.target.querySelectorAll('.product-card');
+                            productCards.forEach((card, index) => {
+                                setTimeout(() => {
+                                    card.classList.add('visible');
+                                }, index * 200);
+                            });
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            // Osserva le sezioni prodotti
+            const productSections = document.querySelectorAll('.products-section');
+            productSections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Smooth scroll per i link di navigazione
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId !== '#') {
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 100,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
